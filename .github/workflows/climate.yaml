@@ -5,12 +5,17 @@ on:
     - cron: "0 */6 * * *"   # every 6 hours
   workflow_dispatch:         # manual trigger
 
+permissions:
+  contents: write   # allow pushing changes back to the repo
+
 jobs:
   fetch-climate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true   # ensures GITHUB_TOKEN is stored for push
 
       - name: Fetch climate data
         run: |
@@ -24,7 +29,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add climate_*.json
-          git commit -m "Update Kausani climate data"
+          git commit -m "Update Kausani climate data" || echo "No changes to commit"
           git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
