@@ -24,6 +24,11 @@ jobs:
           DATA=$(curl -s "https://wttr.in/Kausani?format=j1")
           echo "{\"timestamp\":\"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\",\"data\":${DATA}}" >> $FILE
 
+      - name: Debug Git remote
+        run: |
+          git remote -v
+          git status
+
       - name: Commit and push JSON file
         run: |
           git config --global user.name "github-actions[bot]"
