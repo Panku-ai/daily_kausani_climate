@@ -1,0 +1,28 @@
+name: Fetch Kausani Climate
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # every 6 hours
+  workflow_dispatch:         # manual trigger
+
+jobs:
+  fetch-climate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch climate data
+        run: |
+          MONTH=$(date +'%Y_%m')
+          FILE="climate_${MONTH}.json"
+          DATA=$(curl -s "https://wttr.in/Kausani?format=j1")
+          echo "{\"timestamp\":\"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\",\"data\":${DATA}}" >> $FILE
+
+      - name: Commit and push JSON file
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add climate_*.json
+          git commit -m "Update Kausani climate data"
+          git push
