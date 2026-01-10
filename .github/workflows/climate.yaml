@@ -24,7 +24,7 @@ jobs:
           DATA=$(curl -s "https://wttr.in/Kausani?format=j1")
           echo "{\"timestamp\":\"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\",\"data\":${DATA}}" >> $FILE
 
-      - name: Debug Git remote
+      - name: Debug Git state
         run: |
           git remote -v
           git status
@@ -33,6 +33,18 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Make sure we're up to date with remote main
+          git fetch origin main
+          git checkout main
+          git rebase origin/main || git merge origin/main
+
+          # Stage and commit changes
           git add climate_*.json
           git commit -m "Update Kausani climate data" || echo "No changes to commit"
-          git push
+
+          # Push safely
+          git push origin main
+
+          # Show last few commits for debugging
+          git log --oneline --graph --decorate -n 5
