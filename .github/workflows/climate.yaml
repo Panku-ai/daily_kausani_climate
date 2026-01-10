@@ -26,3 +26,5 @@ jobs:
           git add climate_*.json
           git commit -m "Update Kausani climate data"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
